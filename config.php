@@ -5,12 +5,13 @@ global $CFG;
 
 $CFG = new stdClass();
 
-$CFG->dbtype    = 'mysqli';
+
+$CFG->dbtype    = 'mariadb';
 $CFG->dblibrary = 'native';
 $CFG->dbhost    = 'localhost';  
-$CFG->dbname    = 'mdl_db';
+$CFG->dbname    = 'mdl_usr';
 $CFG->dbuser    = 'root';
-$CFG->dbpass    = '12345678';
+$CFG->dbpass    = '';
 $CFG->prefix    = 'mdl_';
 $CFG->dboptions = array (
   'dbpersist' => 0,
@@ -21,15 +22,15 @@ $CFG->dboptions = array (
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 
-$CFG->wwwroot   = 'http://localhost';
-$CFG->dataroot  = 'D:\\moodledataPTTC1';
+$CFG->wwwroot   = 'http://localhost/moodle4.3_github';
+$CFG->dataroot  = 'E:\\laragon\\moodledataPTTC1';
 $CFG->admin     = 'admin';
 $CFG->theme = 'boost';
 //$CFG->allow_mass_enroll_feature=1;
-// $CFG->directorypermissions = 0777;
+$CFG->directorypermissions = 0777;
 // //$CFG->block_configurable_reports_enable_sql_execution = 1;
-// $CFG->modchooserdefault=0;
-// $CFG->draft_area_bucket_capacity = 5000;
+$CFG->modchooserdefault=0;
+$CFG->draft_area_bucket_capacity = 5000;
 
 
 
