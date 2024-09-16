@@ -25,6 +25,11 @@
 
 namespace report_assign;
 
+
+require_once(__DIR__ . '../../../../vendor/autoload.php');
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
 defined('MOODLE_INTERNAL') || die;
 
 define('FILENAME_SHORTEN', 30);
@@ -760,6 +765,112 @@ class lib {
         }
         $workbook->close();
     }
+
+
+
+    public static function exportCustom($assignment, $filename, $submissions) {
+        global $DB;
+
+        $course = $DB->get_record('course', ['id' => $assignment->course], 'id, fullname, summary', MUST_EXIST);
+        
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+    
+        // Chuẩn bị tiêu đề UTF-8
+        $title = 'DANH SÁCH SINH VIÊN ' . mb_strtoupper($assignment->name, 'UTF-8') . 
+         ' MÔN ' . mb_strtoupper(str_replace("Bài giảng môn học: ", "", $course->summary), 'UTF-8');
+
+        // Thiết lập giá trị cho ô A1
+        $sheet->setCellValue('A1', $title);
+
+
+        $sheet->mergeCells('A1:G1');
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+    
+        // Set the header
+        $sheet->setCellValue('A2', 'STT');
+        $sheet->setCellValue('B2', 'Mã sv');
+        $sheet->setCellValue('C2', 'Họ tên');
+        $sheet->setCellValue('D2', 'Lớp');
+        $sheet->setCellValue('E2', 'Đã nộp');
+        $sheet->setCellValue('F2', 'Chưa nộp');
+        $sheet->setCellValue('G2', 'Thời gian nộp');
+    
+        // Format header
+        $headerRange = 'A2:G2';
+        $sheet->getStyle($headerRange)->getFont()->setBold(true);
+        $sheet->getStyle($headerRange)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle($headerRange)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFF'); 
+
+
+        $row = 3; // Start from the third row after the title
+        // Add borders
+        $sheet->getStyle('A1:G' . ($row - 1))->applyFromArray([
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color' => ['argb' => 'FF000000'], // Black border color
+                ],
+            ],
+        ]);
+    
+        // Add data
+        $submissions = json_decode(json_encode($submissions), true);
+        
+        $number = 1;
+        foreach ($submissions as $index => $submission) {
+            $sheet->setCellValue('A' . $row, $number++);
+            $sheet->setCellValue('B' . $row, strtoupper($submission['username'])); // Mã sv
+            $sheet->setCellValue('C' . $row, $submission['firstname'] . " " . $submission['lastname']);
+            $sheet->setCellValue('D' . $row, str_replace("Bài giảng môn học: ", "", $course->summary));
+            $sheet->setCellValue('E' . $row, $submission['submitted'] ? 'x' : ''); 
+            $sheet->setCellValue('F' . $row, $submission['submitted'] ? '' : 'x'); 
+            $sheet->setCellValue('G' . $row, ($submission['submitted']) ? $submission['modified'] : '');
+            $row++;
+        }
+    
+        $sheet->getStyle('A2:G' . ($row - 1))->applyFromArray([
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color' => ['argb' => 'FF000000'], 
+                ],
+            ],
+        ]);
+    
+        $sheet->getColumnDimension('A')->setWidth(10);
+        $sheet->getColumnDimension('B')->setWidth(15);
+        $sheet->getColumnDimension('C')->setWidth(25);
+        $sheet->getColumnDimension('D')->setWidth(30);
+        $sheet->getColumnDimension('E')->setWidth(15);
+        $sheet->getColumnDimension('F')->setWidth(15);
+        $sheet->getColumnDimension('G')->setWidth(20);
+    
+
+        $lastRow = $row - 1;
+        $alignmentRange = 'D3:G' . $lastRow;
+        $sheet->getStyle($alignmentRange)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+
+        $A = "A3:B". $lastRow;
+        $sheet->getStyle($A)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $writer = new Xlsx($spreadsheet);
+    
+
+        $fontRange = 'A1:G' . $lastRow;
+        $sheet->getStyle($fontRange)->getFont()->setName('Times New Roman')->setSize(13);
+        
+        // Directly output the file for download
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+        $writer->save('php://output');
+    
+        exit;
+    }
+    
 
     /**
      * Export for offline marking

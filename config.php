@@ -26,6 +26,7 @@ $CFG->wwwroot   = 'http://localhost/moodle4.3_github';
 $CFG->dataroot  = 'E:\\laragon\\moodledataPTTC1';
 $CFG->admin     = 'admin';
 $CFG->theme = 'boost';
+
 //$CFG->allow_mass_enroll_feature=1;
 $CFG->directorypermissions = 0777;
 // //$CFG->block_configurable_reports_enable_sql_execution = 1;

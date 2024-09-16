@@ -2,7 +2,7 @@
 
 
 require_once '../../../config.php';
-$PAGE->set_url(new moodle_url('/local/learning_results/index.php'));
+$PAGE->set_url(new moodle_url('/grade/report/learning_results/index.php'));
 $PAGE->set_context(context_system::instance());
 $PAGE->set_title(get_string('learning_results', 'gradereport_learning_results')); 
 $PAGE->set_heading(get_string('learning_results', 'gradereport_learning_results')); 

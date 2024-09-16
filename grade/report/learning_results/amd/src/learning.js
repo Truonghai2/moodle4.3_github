@@ -46,27 +46,6 @@ $('#sortBy').change(function() {
 });
 
 
-// $("#exportFile").click(function(){
-//     $.ajax({
-//         url: Moodle.url + '/grade/report/learning_results/ajax.php', 
-//         method: "POST",
-//         data: {
-//             filterCourse: filterCourse,
-//             sortBy: sortBy,
-//             search: search,
-//             type: type,
-//             actions: 'export',
-//         },
-//         dataType: 'json',
-//         success: function(res) {
-            
-//         },
-//         error: function(jqXHR, textStatus, errorThrown) {
-//             console.error('AJAX error:', textStatus, errorThrown);
-//         }
-//     });
-// })
-// Function to send AJAX request
 function postdata(method = "POST") {
     $.ajax({
         url: Moodle.url + '/grade/report/learning_results/ajax.php', 
@@ -94,3 +73,21 @@ function postdata(method = "POST") {
     });
 }
 
+
+document.getElementById('ExportFile').addEventListener('click', function(e) {
+    e.preventDefault(); // Ngăn chặn hành động mặc định
+
+    // Tạo URL với các tham số
+    const baseUrl =  Moodle.url + '/grade/report/learning_results/export.php';
+    const params = new URLSearchParams({
+        filterCourse: filterCourse,
+        sortBy: sortBy,
+        search: search,
+        type: type
+    }).toString();
+
+    const fullUrl = `${baseUrl}?${params}`;
+
+    // Thay đổi href của link và điều hướng đến URL mới
+    window.location.href = fullUrl;
+});

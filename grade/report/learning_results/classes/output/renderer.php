@@ -44,12 +44,13 @@ class renderer extends \plugin_renderer_base {
      *
      * @return void
      */
-    public function export_excel(string $filterCourse = 'all', string $sortby = 'completed', ?string $search = '', string $type = 'DESC'): void 
+    public function export_excel(string $filterCourse = 'all', string $sortby = 'completed', ?string $search = '', string $type = 'DESC'): bool 
     {
-
-
         $courses = self::get_course_grades($filterCourse, $sortby, $search, $type);
         
+        if(empty($courses)){
+            return false;
+        }
         // Tạo một Spreadsheet mới
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -219,10 +220,16 @@ class renderer extends \plugin_renderer_base {
             if ($search && stripos($course->fullname, $search) === false) {
                 continue; 
             }
-
-
-            $grades_data = $grades_lookup[$course->id] ?? [];
             $completion_percentage = (int) \core_completion\progress::get_course_progress_percentage($course, $USER->id);
+            if ($filterCourse == 'active' && $completion_percentage >= 100) {
+                continue;  
+            }
+            elseif($filterCourse == 'archived' && $completion_percentage < 100){
+                continue;
+            }
+            
+            $grades_data = $grades_lookup[$course->id] ?? [];
+            
             $course_complete = self::courseComplete($course->id, $USER->id);
 
             $result[] = [
@@ -249,7 +256,9 @@ class renderer extends \plugin_renderer_base {
 
         $courses = self::get_course_grades($filterCourse, $sortby, $search, $type);
 
+        if(empty($courses)){
 
+        }
         $html = '
         <div class="table-container" style="margin-top: 20px;" id="table-data">
             <table border="1" cellpadding="10" cellspacing="0" style="width: 100%; border-collapse: collapse;">
@@ -266,6 +275,7 @@ class renderer extends \plugin_renderer_base {
     
             if (!empty($courses)) {
                 foreach ($courses as $course) {
+                    
                     $completion_percentage = htmlspecialchars($course['completion_percentage']) . '%';
                     $qua_trinh = '_'; 
                     $thi_nghiem = '_'; 
