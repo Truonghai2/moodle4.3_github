@@ -150,15 +150,15 @@ if ($assignid) {
 
     // Export as spreadsheet
     if ($export) {
-        $filename = "assign_export_{$assignment->name}.xls";
-        report_assign\lib::export($assignment, $filename, $submissions);
+        $fileName = "Báo Cáo {$assignment->name}.xls";
+        report_assign\lib::exportCustom($assignment, $filename, $submissions);
 
-        // Trigger an assignment viewed event.
-        $event = \report_assign\event\assignment_export::create([
+        $event = \report_assign\event\assignment_offline::create([
             'context' => $context,
             'objectid' => $assignid,
         ]);
         $event->trigger();
+
 
         die;
     }
@@ -174,6 +174,22 @@ if ($assignid) {
             'objectid' => $assignid,
         ]);
         $event->trigger();
+
+        die;
+    }
+
+    if($exportCustom){
+        echo"ok";
+        die();
+        $fileName = "Bao_cao_{$assignment->name}.xls";
+        report_assign\lib::exportCustom($assignment, $filename, $submissions);
+
+        $event = \report_assign\event\assignment_offline::create([
+            'context' => $context,
+            'objectid' => $assignid,
+        ]);
+        $event->trigger();
+
 
         die;
     }

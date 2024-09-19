@@ -79,7 +79,7 @@ class listassign implements renderable, templatable {
             $assignment->dumplink = new \moodle_url('/report/assign/dump.php', ['assign' => $assid, 'id' => $this->course->id]);
             $assignment->groupsubmission = $assign->get_instance()->teamsubmission;
             $assignment->assignurl = new \moodle_url('/mod/assign/view.php', ['id' => $cm->id]);
-
+            $assignment->exportCustom = new \moodle_url($this->fullurl, ['assign' => $assid, 'exportCustom' => 1]);
             // Groups.
             $cm = get_coursemodule_from_instance('assign', $assid);
             $assignment->groupmode = self::groupmode_name($cm->groupmode);

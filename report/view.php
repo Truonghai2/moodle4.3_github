@@ -49,6 +49,24 @@ echo $OUTPUT->heading(get_string('reports'));
 // Check if there is at least one displayable report.
 $hasreports = false;
 if ($reportnode = $PAGE->settingsnav->find('coursereports', \navigation_node::TYPE_CONTAINER)) {
+    $newreportnode = $reportnode->add(
+        get_string('pluginname', 'gradereport_final_score'),
+        new moodle_url('/grade/report/final_score/index.php',['id' => $courseid]),
+        \navigation_node::TYPE_SETTING,
+        null, 
+        'newreportnode'
+    );
+    $course_complete_rate = $reportnode->add(
+        get_string('pluginname', 'gradereport_course_complete'),
+        new moodle_url('/grade/report/course_complete/index.php',['course' => $courseid]),
+        \navigation_node::TYPE_SETTING,
+        null, 
+        'course_complete_rate'
+    );
+
+    $newreportnode->showinflatnavigation = true;
+    $course_complete_rate->showinflatnavigation = true;
+    
     foreach ($reportnode->children as $child) {
         if ($child->display) {
             $hasreports = true;
