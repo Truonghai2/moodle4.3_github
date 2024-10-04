@@ -1,8 +1,0 @@
-{
-  "name": "moodle-atto_c4l-button",
-  "builds": {
-    "moodle-atto_c4l-button": {
-      "jsfiles": ["button.js"]
-    }
-  }
-}
